@@ -12,15 +12,15 @@ import {
   NMEAToDegrees,
 } from "./lib/conversion"
 import { NMEAData } from "./lib/conversion.data"
-
+import { reportError } from "./lib/utils"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import Input from "./components/input"
+import KMLComponent from "./components/KML"
+import NMEAComponent from "./components/NMEA"
+import EXIFComponent from "./components/EXIF"
 
-function reportError(...messages: (string | number)[]) {
-  console.error(...messages)
-  toast(messages.join(" "), { type: "error" })
-}
+export type SetAllArg = { kml: DecimalDegrees; exif: EXIF; nmea: NMEA }
 
 export function App() {
   const defaultData = NMEAData[2]
@@ -31,118 +31,10 @@ export function App() {
   )
   const [exif, setExif] = useState<EXIF>(NMEAToDegrees(defaultData))
 
-  function updateToKML(target: "lat" | "long", value: number) {
-    if (typeof value !== "number" || Number.isNaN(value)) {
-      reportError("Invalid value", value, "for kml target", target)
-      return
-    }
-
-    if (target === "lat") {
-      kml[0] = value
-    } else {
-      kml[1] = value
-    }
-
-    setKml(kml)
-    setExif(decimalDegreesToDegrees(kml))
-    setNmea(decimalDegreesToNMEA(kml))
-  }
-
-  function updateToNMEA(
-    target: "lat" | "latDir" | "long" | "longDir",
-    value: string | number
-  ) {
-    switch (target) {
-      case "lat": {
-        if (typeof value !== "number") {
-          reportError("Invalid value", value, "for nmea target", target)
-        } else {
-          if (value < 0 || value > 18000) {
-            reportError("Invalid value", value, "for nmea target", target)
-          } else {
-            nmea[0][0] = value as number
-          }
-        }
-        break
-      }
-      case "latDir": {
-        if (!["N", "S"].includes(value as string)) {
-          reportError("Invalid value", value, "for nmea target", target)
-        } else {
-          nmea[0][1] = value as "N" | "S"
-        }
-
-        break
-      }
-      case "long": {
-        if (typeof value !== "number") {
-          reportError("Invalid value", value, "for nmea target", target)
-        } else {
-          if (value < 0 || value > 18000) {
-            reportError("Invalid value", value, "for nmea target", target)
-          } else {
-            nmea[1][0] = value as number
-          }
-        }
-        break
-      }
-      case "longDir": {
-        if (!["W", "E"].includes(value as string)) {
-          reportError("Invalid value", value, "for nmea target", target)
-        } else {
-          nmea[1][1] = value as "W" | "E"
-        }
-        break
-      }
-    }
-
-    setNmea(nmea)
-    setKml(NMEAToDecimalDegrees(nmea))
-    setExif(NMEAToDegrees(nmea))
-  }
-
-  function updateToExif(
-    target: "latD" | "latM" | "latS" | "longD" | "longM" | "longS",
-    value: number
-  ) {
-    if (typeof value !== "number" || Number.isNaN(value)) {
-      reportError("Invalid value", value, "for exif target", target)
-      return
-    }
-
-    if (["latM", "latS", "longM", "longS"].includes(target)) {
-      if (value < 0 || value > 60) {
-        reportError("Invalid value", value, "for exif target", target)
-        return
-      }
-    }
-
-    if (!["latS", "longS"].includes(target)) {
-      value = Math.trunc(value)
-    }
-
-    if (target === "latD" && Math.abs(value) > 90) {
-      reportError("Invalid value", value, "for exif target", target)
-      return
-    }
-
-    if (target === "longD" && Math.abs(value) > 180) {
-      reportError("Invalid value", value, "for exif target", target)
-      return
-    }
-
-    let index = 0
-    if (target.includes("M")) {
-      index = 1
-    } else {
-      index = 2
-    }
-
-    exif[target.includes("lat") ? 0 : 1][index] = value
-
-    setExif(exif)
-    setKml(degreesToDecimalDegrees(exif))
-    setNmea(degreesToNMEA(exif))
+  const setAll = ({ kml: newKml, exif: newExif, nmea: newNmea }: SetAllArg) => {
+    setKml(newKml)
+    setNmea(newNmea)
+    setExif(newExif)
   }
 
   function generalInput(input: string): boolean {
@@ -223,150 +115,15 @@ export function App() {
           <Input
             type="text"
             onChange={(event) => {
-              if (generalInput(event.currentTarget.value))
-                event.currentTarget.value = ""
+              if (generalInput(event.currentTarget.value)) {
+                toast("Coordinates were updated", { type: "success" })
+              }
             }}
           />
         </div>
-        <div>
-          <p>Google kml (latitude, longitude)</p>
-
-          <div className="flex w-full">
-            <Input
-              type="number"
-              name="lat"
-              value={kml[0]}
-              onChange={(event) => {
-                updateToKML("lat", Number.parseFloat(event.currentTarget.value))
-              }}
-            />
-            <Input
-              type="number"
-              name="long"
-              value={kml[1]}
-              onChange={(event) => {
-                updateToKML(
-                  "long",
-                  Number.parseFloat(event.currentTarget.value)
-                )
-              }}
-            />
-          </div>
-        </div>
-        <div>
-          <p>NMEA 0183</p>
-          <div className="flex w-full">
-            <Input
-              type="number"
-              value={nmea[0][0]}
-              onChange={(event) =>
-                updateToNMEA(
-                  "lat",
-                  Number.parseFloat(event.currentTarget.value)
-                )
-              }
-            />
-            <select
-              value={nmea[0][1]}
-              onChange={(event) =>
-                updateToNMEA("latDir", event.currentTarget.value)
-              }>
-              <option value="N">N</option>
-              <option value="S">S</option>
-            </select>
-          </div>
-          <div className="flex w-full">
-            <Input
-              type="number"
-              value={nmea[1][0]}
-              onChange={(event) =>
-                updateToNMEA(
-                  "long",
-                  Number.parseFloat(event.currentTarget.value)
-                )
-              }
-            />
-            <select
-              value={nmea[1][1]}
-              onChange={(event) =>
-                updateToNMEA("longDir", event.currentTarget.value)
-              }>
-              <option value="W">W</option>
-              <option value="E">E</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <p>JPEG EXIF</p>
-          <div className="w-full flex">
-            <Input
-              type="number"
-              value={exif[0][0]}
-              onChange={(event) =>
-                updateToExif(
-                  "latD",
-                  Number.parseInt(event.currentTarget.value, 10)
-                )
-              }
-            />
-            ;
-            <Input
-              type="number"
-              value={exif[0][1]}
-              onChange={(event) =>
-                updateToExif(
-                  "latM",
-                  Number.parseInt(event.currentTarget.value, 10)
-                )
-              }
-            />
-            ;
-            <Input
-              type="number"
-              value={exif[0][2]}
-              onChange={(event) =>
-                updateToExif(
-                  "latS",
-                  Number.parseFloat(event.currentTarget.value)
-                )
-              }
-            />
-          </div>
-          <div className="w-full flex">
-            <Input
-              type="number"
-              value={exif[1][0]}
-              onChange={(event) =>
-                updateToExif(
-                  "longD",
-                  Number.parseInt(event.currentTarget.value, 10)
-                )
-              }
-            />
-            ;
-            <Input
-              type="number"
-              value={exif[1][1]}
-              onChange={(event) =>
-                updateToExif(
-                  "longM",
-                  Number.parseInt(event.currentTarget.value, 10)
-                )
-              }
-            />
-            ;
-            <Input
-              type="number"
-              value={exif[1][2]}
-              onChange={(event) =>
-                updateToExif(
-                  "longS",
-                  Number.parseFloat(event.currentTarget.value)
-                )
-              }
-            />
-          </div>
-        </div>
+        <KMLComponent kml={kml} setAll={setAll} />
+        <NMEAComponent nmea={nmea} setAll={setAll} />
+        <EXIFComponent exif={exif} setAll={setAll} />
       </div>
       <ToastContainer />
     </>
