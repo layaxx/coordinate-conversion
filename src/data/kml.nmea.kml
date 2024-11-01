@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Folder><name>Waypoints</name>
+  <Placemark>
+	<name>Pont 1</name>
+      <Point><coordinates>10.882383,49.898433</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Pont 2</name>
+      <Point><coordinates>10.890583,49.9015</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>africa</name>
+      <Point><coordinates>23.863333,-29.14595</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>canada</name>
+      <Point><coordinates>-123.731117,54.423067</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>argntn</name>
+      <Point><coordinates>-70.82595,-47.453</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>new zl</name>
+      <Point><coordinates>168.903883,-44.7533</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>mongol</name>
+      <Point><coordinates>107.732,49.002983</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>antrct</name>
+      <Point><coordinates>96.482,-68.993233</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>
