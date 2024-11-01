@@ -14,8 +14,6 @@ import {
 import { NMEAData } from "./lib/conversion.data"
 
 export function App() {
-  console.log(degreesToNMEA(decimalDegreesToDegrees([50.985435, 11.321463])))
-
   const defaultData = NMEAData[2]
 
   const [nmea, setNmea] = useState<NMEA>(defaultData)
@@ -138,9 +136,87 @@ export function App() {
     setNmea(degreesToNMEA(exif))
   }
 
+  function generalInput(input: string): boolean {
+    let match
+    if ((match = input.match(/^(\d+\.\d+)\s*,\s*(\d+\.\d+)\s*$/))) {
+      const newKML: DecimalDegrees = [
+        Number.parseFloat(match[1]),
+        Number.parseFloat(match[2]),
+      ]
+      setKml(newKML)
+      setNmea(decimalDegreesToNMEA(newKML))
+      setExif(decimalDegreesToDegrees(newKML))
+      console.log("KML detected")
+      return true
+    }
+
+    if (
+      (match = input.match(
+        /^(\d+\.\d+)\s*,\s*(N|S)\s*,\s*(\d+\.\d+)\s*,\s*(W|E)\s*$/
+      ))
+    ) {
+      if (!["N", "S"].includes(match[2]) || !["W", "E"].includes(match[4])) {
+        console.error("Failed to parse NMEA")
+        return false
+      }
+      const newNMEA: NMEA = [
+        [Number.parseFloat(match[1]), match[2] as "N" | "S"],
+        [Number.parseFloat(match[3]), match[4] as "W" | "E"],
+      ]
+      setNmea(newNMEA)
+      setExif(NMEAToDegrees(newNMEA))
+      setKml(NMEAToDecimalDegrees(newNMEA))
+
+      console.log("NMEA detected")
+      return true
+    }
+
+    if (
+      (match = input.match(
+        /^\s*(\d+\s*;\s*)(\d+\s*;\s*)(\d+\.?\d*\s*)(\d+\s*;\s*)(\d+\s*;\s*)(\d+\.?\d*\s*)$/
+      ))
+    ) {
+      const newEXIF: EXIF = [
+        [match[1], match[2], match[3]]
+          .map((string) => string.replace(";", ""))
+          .map((string, index) =>
+            index === 2
+              ? Number.parseFloat(string)
+              : Number.parseInt(string, 10)
+          ),
+        [match[4], match[5], match[6]]
+          .map((string) => string.replace(";", ""))
+          .map((string, index) =>
+            index === 2
+              ? Number.parseFloat(string)
+              : Number.parseInt(string, 10)
+          ),
+      ] as EXIF
+
+      setExif(newEXIF)
+      setKml(degreesToDecimalDegrees(newEXIF))
+      setNmea(degreesToNMEA(newEXIF))
+      console.log("EXIF detected")
+
+      return true
+    }
+
+    console.warn("unknown format")
+    return false
+  }
+
   return (
     <>
       <div>
+        <div>
+          <p>General Input (format is auto-detected)</p>
+          <input
+            type="text"
+            onChange={(event) => {
+              if (generalInput(event.currentTarget.value))
+                event.currentTarget.value = ""
+            }}></input>
+        </div>
         <div>
           <p>Google kml (latitude, longitude)</p>
           <input
@@ -149,14 +225,16 @@ export function App() {
             value={kml[0]}
             onChange={(event) => {
               updateToKML("lat", Number.parseFloat(event.currentTarget.value))
-            }}></input>
+            }}
+          />
           <input
             type="number"
             name="long"
             value={kml[1]}
             onChange={(event) => {
               updateToKML("long", Number.parseFloat(event.currentTarget.value))
-            }}></input>
+            }}
+          />
         </div>
         <div>
           <p>NMEA 0183</p>
@@ -202,7 +280,8 @@ export function App() {
                   "latD",
                   Number.parseInt(event.currentTarget.value, 10)
                 )
-              }></input>
+              }
+            />
             ;
             <input
               type="number"
@@ -212,7 +291,8 @@ export function App() {
                   "latM",
                   Number.parseInt(event.currentTarget.value, 10)
                 )
-              }></input>
+              }
+            />
             ;
             <input
               type="number"
@@ -222,7 +302,8 @@ export function App() {
                   "latS",
                   Number.parseFloat(event.currentTarget.value)
                 )
-              }></input>
+              }
+            />
           </div>
           <div>
             <input
