@@ -15,6 +15,7 @@ import { NMEAData } from "./lib/conversion.data"
 
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import Input from "./components/input"
 
 function reportError(...messages: (string | number)[]) {
   console.error(...messages)
@@ -215,10 +216,11 @@ export function App() {
 
   return (
     <>
+      <h1 className="text-2xl font-bold">Coordinates</h1>
       <div>
         <div>
           <p>General Input (format is auto-detected)</p>
-          <input
+          <Input
             type="text"
             onChange={(event) => {
               if (generalInput(event.currentTarget.value))
@@ -228,60 +230,76 @@ export function App() {
         </div>
         <div>
           <p>Google kml (latitude, longitude)</p>
-          <input
-            type="number"
-            name="lat"
-            value={kml[0]}
-            onChange={(event) => {
-              updateToKML("lat", Number.parseFloat(event.currentTarget.value))
-            }}
-          />
-          <input
-            type="number"
-            name="long"
-            value={kml[1]}
-            onChange={(event) => {
-              updateToKML("long", Number.parseFloat(event.currentTarget.value))
-            }}
-          />
+
+          <div className="flex w-full">
+            <Input
+              type="number"
+              name="lat"
+              value={kml[0]}
+              onChange={(event) => {
+                updateToKML("lat", Number.parseFloat(event.currentTarget.value))
+              }}
+            />
+            <Input
+              type="number"
+              name="long"
+              value={kml[1]}
+              onChange={(event) => {
+                updateToKML(
+                  "long",
+                  Number.parseFloat(event.currentTarget.value)
+                )
+              }}
+            />
+          </div>
         </div>
         <div>
           <p>NMEA 0183</p>
-          <input
-            type="number"
-            value={nmea[0][0]}
-            onChange={(event) =>
-              updateToNMEA("lat", Number.parseFloat(event.currentTarget.value))
-            }
-          />
-          <select
-            value={nmea[0][1]}
-            onChange={(event) =>
-              updateToNMEA("latDir", event.currentTarget.value)
-            }>
-            <option value="N">N</option>
-            <option value="S">S</option>
-          </select>
-          <input
-            type="number"
-            value={nmea[1][0]}
-            onChange={(event) =>
-              updateToNMEA("long", Number.parseFloat(event.currentTarget.value))
-            }
-          />
-          <select
-            value={nmea[1][1]}
-            onChange={(event) =>
-              updateToNMEA("longDir", event.currentTarget.value)
-            }>
-            <option value="W">W</option>
-            <option value="E">E</option>
-          </select>
+          <div className="flex w-full">
+            <Input
+              type="number"
+              value={nmea[0][0]}
+              onChange={(event) =>
+                updateToNMEA(
+                  "lat",
+                  Number.parseFloat(event.currentTarget.value)
+                )
+              }
+            />
+            <select
+              value={nmea[0][1]}
+              onChange={(event) =>
+                updateToNMEA("latDir", event.currentTarget.value)
+              }>
+              <option value="N">N</option>
+              <option value="S">S</option>
+            </select>
+          </div>
+          <div className="flex w-full">
+            <Input
+              type="number"
+              value={nmea[1][0]}
+              onChange={(event) =>
+                updateToNMEA(
+                  "long",
+                  Number.parseFloat(event.currentTarget.value)
+                )
+              }
+            />
+            <select
+              value={nmea[1][1]}
+              onChange={(event) =>
+                updateToNMEA("longDir", event.currentTarget.value)
+              }>
+              <option value="W">W</option>
+              <option value="E">E</option>
+            </select>
+          </div>
         </div>
         <div>
           <p>JPEG EXIF</p>
-          <div>
-            <input
+          <div className="w-full flex">
+            <Input
               type="number"
               value={exif[0][0]}
               onChange={(event) =>
@@ -292,7 +310,7 @@ export function App() {
               }
             />
             ;
-            <input
+            <Input
               type="number"
               value={exif[0][1]}
               onChange={(event) =>
@@ -303,7 +321,7 @@ export function App() {
               }
             />
             ;
-            <input
+            <Input
               type="number"
               value={exif[0][2]}
               onChange={(event) =>
@@ -314,8 +332,8 @@ export function App() {
               }
             />
           </div>
-          <div>
-            <input
+          <div className="w-full flex">
+            <Input
               type="number"
               value={exif[1][0]}
               onChange={(event) =>
@@ -326,7 +344,7 @@ export function App() {
               }
             />
             ;
-            <input
+            <Input
               type="number"
               value={exif[1][1]}
               onChange={(event) =>
@@ -337,7 +355,7 @@ export function App() {
               }
             />
             ;
-            <input
+            <Input
               type="number"
               value={exif[1][2]}
               onChange={(event) =>
