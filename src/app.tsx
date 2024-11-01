@@ -13,6 +13,14 @@ import {
 } from "./lib/conversion"
 import { NMEAData } from "./lib/conversion.data"
 
+import { ToastContainer, toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+
+function reportError(...messages: (string | number)[]) {
+  console.error(...messages)
+  toast(messages.join(" "), { type: "error" })
+}
+
 export function App() {
   const defaultData = NMEAData[2]
 
@@ -24,7 +32,7 @@ export function App() {
 
   function updateToKML(target: "lat" | "long", value: number) {
     if (typeof value !== "number" || Number.isNaN(value)) {
-      console.error("Invalid value", value, "for kml target", target)
+      reportError("Invalid value", value, "for kml target", target)
       return
     }
 
@@ -46,10 +54,10 @@ export function App() {
     switch (target) {
       case "lat": {
         if (typeof value !== "number") {
-          console.error("Invalid value", value, "for nmea target", target)
+          reportError("Invalid value", value, "for nmea target", target)
         } else {
           if (value < 0 || value > 18000) {
-            console.error("Invalid value", value, "for nmea target", target)
+            reportError("Invalid value", value, "for nmea target", target)
           } else {
             nmea[0][0] = value as number
           }
@@ -58,7 +66,7 @@ export function App() {
       }
       case "latDir": {
         if (!["N", "S"].includes(value as string)) {
-          console.error("Invalid value", value, "for nmea target", target)
+          reportError("Invalid value", value, "for nmea target", target)
         } else {
           nmea[0][1] = value as "N" | "S"
         }
@@ -67,10 +75,10 @@ export function App() {
       }
       case "long": {
         if (typeof value !== "number") {
-          console.error("Invalid value", value, "for nmea target", target)
+          reportError("Invalid value", value, "for nmea target", target)
         } else {
           if (value < 0 || value > 18000) {
-            console.error("Invalid value", value, "for nmea target", target)
+            reportError("Invalid value", value, "for nmea target", target)
           } else {
             nmea[1][0] = value as number
           }
@@ -79,7 +87,7 @@ export function App() {
       }
       case "longDir": {
         if (!["W", "E"].includes(value as string)) {
-          console.error("Invalid value", value, "for nmea target", target)
+          reportError("Invalid value", value, "for nmea target", target)
         } else {
           nmea[1][1] = value as "W" | "E"
         }
@@ -97,13 +105,13 @@ export function App() {
     value: number
   ) {
     if (typeof value !== "number" || Number.isNaN(value)) {
-      console.error("Invalid value", value, "for exif target", target)
+      reportError("Invalid value", value, "for exif target", target)
       return
     }
 
     if (["latM", "latS", "longM", "longS"].includes(target)) {
       if (value < 0 || value > 60) {
-        console.error("Invalid value", value, "for exif target", target)
+        reportError("Invalid value", value, "for exif target", target)
         return
       }
     }
@@ -113,12 +121,12 @@ export function App() {
     }
 
     if (target === "latD" && Math.abs(value) > 90) {
-      console.error("Invalid value", value, "for exif target", target)
+      reportError("Invalid value", value, "for exif target", target)
       return
     }
 
     if (target === "longD" && Math.abs(value) > 180) {
-      console.error("Invalid value", value, "for exif target", target)
+      reportError("Invalid value", value, "for exif target", target)
       return
     }
 
@@ -156,7 +164,7 @@ export function App() {
       ))
     ) {
       if (!["N", "S"].includes(match[2]) || !["W", "E"].includes(match[4])) {
-        console.error("Failed to parse NMEA")
+        reportError("Failed to parse NMEA")
         return false
       }
       const newNMEA: NMEA = [
@@ -215,7 +223,8 @@ export function App() {
             onChange={(event) => {
               if (generalInput(event.currentTarget.value))
                 event.currentTarget.value = ""
-            }}></input>
+            }}
+          />
         </div>
         <div>
           <p>Google kml (latitude, longitude)</p>
@@ -341,6 +350,7 @@ export function App() {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </>
   )
 }
