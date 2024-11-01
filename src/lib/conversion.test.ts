@@ -5,9 +5,7 @@ import {
   degreesToDecimalDegrees,
   degreesToNMEA,
   decimalDegreesToNMEA,
-  DecimalDegrees,
   NMEAToDegrees,
-  NMEA,
 } from "./conversion"
 import {
   decimalDegreesData,

@@ -1,4 +1,4 @@
-import { DecimalDegrees, Degrees, EXIF, NMEA } from "./conversion"
+import { DecimalDegrees, Degrees, NMEA } from "./conversion"
 
 export const decimalDegreesToNMEAData: Array<[DecimalDegrees, NMEA]> = [
   [
