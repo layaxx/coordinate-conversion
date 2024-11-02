@@ -31,7 +31,9 @@ const KMLComponent: FC<{
 
   return (
     <div>
-      <p>Google kml (latitude, longitude)</p>
+      <h3 className="font-semibold text-lg my-2">
+        Google kml (latitude, longitude)
+      </h3>
 
       <div className="flex w-full">
         <Input

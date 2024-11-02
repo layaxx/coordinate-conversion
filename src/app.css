@@ -1,25 +1,16 @@
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  display: contents;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.preact:hover {
-  filter: drop-shadow(0 0 2em #673ab8aa);
+#coord-table tr {
+  vertical-align: text-top;
 }
 
-.card {
-  padding: 2em;
+#coord-table th,
+#coord-table td {
+  text-align: left;
 }
 
-.read-the-docs {
-  color: #888;
+#coord-table th {
+  padding-right: 1rem;
 }

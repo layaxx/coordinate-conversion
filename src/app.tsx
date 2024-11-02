@@ -108,10 +108,18 @@ export function App() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold">Coordinates</h1>
-      <div>
-        <div>
-          <p>General Input (format is auto-detected)</p>
+      <header className="bg-slate-600 text-slate-100 w-full">
+        <div className="mx-auto max-w-screen-lg p-4">
+          <h1 className="text-2xl font-bold">
+            Coordinate Conversion & Distances
+          </h1>
+        </div>
+      </header>
+      <main className="flex-grow p-4 md:p-8 max-w-screen-lg md:pt-2">
+        <div className="mb-8">
+          <h3 className="font-semibold text-lg my-2">
+            General Input (format is auto-detected)
+          </h3>
           <Input
             type="text"
             onChange={(event) => {
@@ -120,11 +128,52 @@ export function App() {
               }
             }}
           />
+          <p>
+            Either paste a string in the box above or adjust any of the inputs
+            below. All other formats (not the field above) will adapt to any
+            changes. If you want to input decimal formats, you might need to put
+            a dot between digits, at the end does not work.
+          </p>
         </div>
+        <hr />
         <KMLComponent kml={kml} setAll={setAll} />
         <NMEAComponent nmea={nmea} setAll={setAll} />
         <EXIFComponent exif={exif} setAll={setAll} />
-      </div>
+
+        <div className="border border-black mt-4">
+          <h2 className="text-2xl font-semibold my-2">Overview</h2>
+          <table>
+            <tbody id="coord-table">
+              <tr>
+                <th>Google KML</th>
+                <td>
+                  {kml[0]}, {kml[1]}
+                </td>
+              </tr>
+              <tr>
+                <th>NMEA 0183</th>
+                <td>
+                  {nmea[0][0]},{nmea[0][1]},{nmea[1][0]},{nmea[1][1]}
+                </td>
+              </tr>
+              <tr>
+                <th>JPEG EXIF</th>
+                <td>
+                  {exif[0].join(";")}
+                  <br />
+                  {exif[1].join(";")}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+
+      <footer className="bg-slate-600 text-slate-100 w-full ">
+        <div className="mx-auto max-w-screen-lg px-4 py-2">
+          <h2 className="font-bold">by Yannick Lang for UiXD</h2>
+        </div>
+      </footer>
       <ToastContainer />
     </>
   )

@@ -64,40 +64,42 @@ const NMEAComponent: FC<{
 
   return (
     <div>
-      <p>NMEA 0183</p>
+      <h3 className="font-semibold text-lg my-2">NMEA 0183</h3>
       <div className="flex w-full">
-        <Input
-          type="number"
-          value={nmea[0][0]}
-          onChange={(event) =>
-            updateToNMEA("lat", Number.parseFloat(event.currentTarget.value))
-          }
-        />
-        <select
-          value={nmea[0][1]}
-          onChange={(event) =>
-            updateToNMEA("latDir", event.currentTarget.value)
-          }>
-          <option value="N">N</option>
-          <option value="S">S</option>
-        </select>
-      </div>
-      <div className="flex w-full">
-        <Input
-          type="number"
-          value={nmea[1][0]}
-          onChange={(event) =>
-            updateToNMEA("long", Number.parseFloat(event.currentTarget.value))
-          }
-        />
-        <select
-          value={nmea[1][1]}
-          onChange={(event) =>
-            updateToNMEA("longDir", event.currentTarget.value)
-          }>
-          <option value="W">W</option>
-          <option value="E">E</option>
-        </select>
+        <div className="flex ">
+          <Input
+            type="number"
+            value={nmea[0][0]}
+            onChange={(event) =>
+              updateToNMEA("lat", Number.parseFloat(event.currentTarget.value))
+            }
+          />
+          <select
+            value={nmea[0][1]}
+            onChange={(event) =>
+              updateToNMEA("latDir", event.currentTarget.value)
+            }>
+            <option value="N">N</option>
+            <option value="S">S</option>
+          </select>
+        </div>
+        <div className="flex ">
+          <Input
+            type="number"
+            value={nmea[1][0]}
+            onChange={(event) =>
+              updateToNMEA("long", Number.parseFloat(event.currentTarget.value))
+            }
+          />
+          <select
+            value={nmea[1][1]}
+            onChange={(event) =>
+              updateToNMEA("longDir", event.currentTarget.value)
+            }>
+            <option value="W">W</option>
+            <option value="E">E</option>
+          </select>
+        </div>
       </div>
     </div>
   )

@@ -55,7 +55,7 @@ const EXIFComponent: FC<{
 
   return (
     <div>
-      <p>JPEG EXIF</p>
+      <h3 className="font-semibold text-lg my-2">JPEG EXIF</h3>
       <div className="w-full flex">
         <Input
           type="number"
