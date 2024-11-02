@@ -3,6 +3,7 @@ import { SetAllArg } from "../app"
 import { NMEA, NMEAToDecimalDegrees, NMEAToDegrees } from "../lib/conversion"
 import Input from "./input"
 import { reportError } from "../lib/utils"
+import { validateNMEA } from "../lib/validation"
 
 const NMEAComponent: FC<{
   nmea: NMEA
@@ -14,52 +15,31 @@ const NMEAComponent: FC<{
   ) {
     switch (target) {
       case "lat": {
-        if (typeof value !== "number") {
-          reportError("Invalid value", value, "for nmea target", target)
-        } else {
-          if (value < 0 || value > 18000) {
-            reportError("Invalid value", value, "for nmea target", target)
-          } else {
-            nmea[0][0] = value as number
-          }
-        }
+        nmea[0][0] = value as number
         break
       }
       case "latDir": {
-        if (!["N", "S"].includes(value as string)) {
-          reportError("Invalid value", value, "for nmea target", target)
-        } else {
-          nmea[0][1] = value as "N" | "S"
-        }
-
+        nmea[0][1] = value as "N" | "S"
         break
       }
       case "long": {
-        if (typeof value !== "number") {
-          reportError("Invalid value", value, "for nmea target", target)
-        } else {
-          if (value < 0 || value > 18000) {
-            reportError("Invalid value", value, "for nmea target", target)
-          } else {
-            nmea[1][0] = value as number
-          }
-        }
+        nmea[1][0] = value as number
         break
       }
       case "longDir": {
-        if (!["W", "E"].includes(value as string)) {
-          reportError("Invalid value", value, "for nmea target", target)
-        } else {
-          nmea[1][1] = value as "W" | "E"
-        }
+        nmea[1][1] = value as "W" | "E"
         break
       }
     }
+    const validationResult = validateNMEA(nmea)
+    if (validationResult.success) {
+      const kml = NMEAToDecimalDegrees(nmea)
+      const exif = NMEAToDegrees(nmea)
 
-    const kml = NMEAToDecimalDegrees(nmea)
-    const exif = NMEAToDegrees(nmea)
-
-    setAll({ nmea, exif, kml })
+      setAll({ nmea, exif, kml })
+    } else {
+      reportError(validationResult.error)
+    }
   }
 
   return (

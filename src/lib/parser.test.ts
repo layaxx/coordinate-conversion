@@ -1,6 +1,8 @@
-import { expect, test } from "vitest"
+import { expect, test, vi } from "vitest"
 import { realWorldParsingData } from "./parser.data"
 import { generalInput } from "./parser"
+
+vi.mock("react-toastify", () => ({ toast: vi.fn() }))
 
 test.each(realWorldParsingData)(
   "real world data parses as expected",

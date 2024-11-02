@@ -3,6 +3,7 @@ import Input from "./input"
 import { reportError } from "../lib/utils"
 import { FC } from "preact/compat"
 import { SetAllArg } from "../app"
+import { validateDegrees } from "../lib/validation"
 
 const EXIFComponent: FC<{
   exif: EXIF
@@ -12,30 +13,8 @@ const EXIFComponent: FC<{
     target: "latD" | "latM" | "latS" | "longD" | "longM" | "longS",
     value: number
   ) {
-    if (typeof value !== "number" || Number.isNaN(value)) {
-      reportError("Invalid value", value, "for exif target", target)
-      return
-    }
-
-    if (["latM", "latS", "longM", "longS"].includes(target)) {
-      if (value < 0 || value > 60) {
-        reportError("Invalid value", value, "for exif target", target)
-        return
-      }
-    }
-
     if (!["latS", "longS"].includes(target)) {
       value = Math.trunc(value)
-    }
-
-    if (target === "latD" && Math.abs(value) > 90) {
-      reportError("Invalid value", value, "for exif target", target)
-      return
-    }
-
-    if (target === "longD" && Math.abs(value) > 180) {
-      reportError("Invalid value", value, "for exif target", target)
-      return
     }
 
     let index = 0
@@ -47,10 +26,15 @@ const EXIFComponent: FC<{
 
     exif[target.includes("lat") ? 0 : 1][index] = value
 
-    const kml = degreesToDecimalDegrees(exif)
-    const nmea = degreesToNMEA(exif)
+    const validationResult = validateDegrees(exif)
+    if (validationResult.success) {
+      const kml = degreesToDecimalDegrees(exif)
+      const nmea = degreesToNMEA(exif)
 
-    setAll({ exif, kml, nmea })
+      setAll({ exif, kml, nmea })
+    } else {
+      reportError(validationResult.error)
+    }
   }
 
   return (

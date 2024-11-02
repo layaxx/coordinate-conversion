@@ -7,26 +7,28 @@ import {
 import { reportError } from "../lib/utils"
 import Input from "./input"
 import { SetAllArg } from "../app"
+import { validateDecimalDegrees } from "../lib/validation"
 
 const KMLComponent: FC<{
   kml: DecimalDegrees
   setAll: (arg: SetAllArg) => void
 }> = ({ kml, setAll }) => {
   function updateToKML(target: "lat" | "long", value: number) {
-    if (typeof value !== "number" || Number.isNaN(value)) {
-      reportError("Invalid value", value, "for kml target", target)
-      return
-    }
-
     if (target === "lat") {
       kml[0] = value
     } else {
       kml[1] = value
     }
-    const exif = decimalDegreesToDegrees(kml)
-    const nmea = decimalDegreesToNMEA(kml)
 
-    setAll({ kml, exif, nmea })
+    const validationResult = validateDecimalDegrees(kml)
+    if (validationResult.success) {
+      const exif = decimalDegreesToDegrees(kml)
+      const nmea = decimalDegreesToNMEA(kml)
+
+      setAll({ kml, exif, nmea })
+    } else {
+      reportError(validationResult.error)
+    }
   }
 
   return (

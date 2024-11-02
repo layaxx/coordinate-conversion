@@ -5,6 +5,13 @@ import {
   NMEA,
   NMEAToDecimalDegrees,
 } from "./conversion"
+import {
+  validateDecimalDegrees,
+  validateDegrees,
+  validateNMEA,
+} from "./validation"
+import { reportError } from "./utils"
+import { toast } from "react-toastify"
 
 type ParserResponse =
   | undefined
@@ -22,11 +29,18 @@ export function generalInput(input: string): ParserResponse {
   }
 
   let match
-  if ((match = input.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/))) {
+  if ((match = input.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s*$/))) {
     const newKML: DecimalDegrees = [
       Number.parseFloat(match[1]),
       Number.parseFloat(match[2]),
     ]
+
+    const validationResponse = validateDecimalDegrees(newKML)
+
+    if (!validationResponse.success) {
+      reportError(validationResponse.error)
+      return
+    }
 
     console.log("KML detected")
     return { type: "kml", value: newKML }
@@ -34,7 +48,7 @@ export function generalInput(input: string): ParserResponse {
 
   if (
     (match = input.match(
-      /^(\d+\.\d+)\s*,\s*(N|S)\s*,\s*(\d+\.\d+)\s*,\s*(W|E)\s*$/
+      /^(\d+\.?\d*)\s*,\s*(N|S)\s*,\s*(\d+\.?\d*)\s*,\s*(W|E)\s*$/
     ))
   ) {
     if (!["N", "S"].includes(match[2]) || !["W", "E"].includes(match[4])) {
@@ -45,6 +59,14 @@ export function generalInput(input: string): ParserResponse {
       [Number.parseFloat(match[1]), match[2] as "N" | "S"],
       [Number.parseFloat(match[3]), match[4] as "W" | "E"],
     ]
+
+    const validationResponse = validateNMEA(newNMEA)
+
+    if (!validationResponse.success) {
+      reportError(validationResponse.error)
+      return
+    }
+
     console.log("NMEA detected")
     return { type: "nmea", value: newNMEA }
   }
@@ -67,13 +89,20 @@ export function generalInput(input: string): ParserResponse {
         ),
     ] as EXIF
 
+    const validationResponse = validateDegrees(newEXIF)
+
+    if (!validationResponse.success) {
+      reportError(validationResponse.error)
+      return
+    }
+
     console.log("EXIF detected")
     return { type: "exif", value: newEXIF }
   }
 
   if (
     (match = input.match(
-      /^(N|S)?(\d+)°?\s+(\d+)'?\s+(\d+\.\d+)"?\s+(E|W)?(\d+)°?\s+(\d+)'?\s+(\d+\.\d+)"?\s*$/
+      /^(N|S)?(\d+)°?\s+(\d+)'?\s+(\d+\.?\d*)"?\s+(E|W)?(\d+)°?\s+(\d+)'?\s+(\d+\.?\d*)"?\s*$/
     ))
   ) {
     const [_, latDir, latD, latM, latS, longDir, longD, longM, longS] = match
@@ -91,13 +120,20 @@ export function generalInput(input: string): ParserResponse {
       ],
     ] as EXIF
 
+    const validationResponse = validateDegrees(newEXIF)
+
+    if (!validationResponse.success) {
+      reportError(validationResponse.error)
+      return
+    }
+
     console.log("EXIF detected")
     return { type: "exif", value: newEXIF }
   }
 
   if (
     (match = input.match(
-      /^(N|S)(\d+)°?\s+(\d+\.\d+)\s+(E|W)(\d+)°?\s+(\d+\.\d+)\s*$/
+      /^(N|S)(\d+)°?\s+(\d+\.?\d*)\s+(E|W)(\d+)°?\s+(\d+\.?\d*)\s*$/
     ))
   ) {
     const [_, latDir, latD, latM, longDir, longD, longM] = match
@@ -107,11 +143,23 @@ export function generalInput(input: string): ParserResponse {
       [Number.parseInt(longD) * 100 + Number.parseFloat(longM), longDir],
     ] as NMEA
 
+    const validationResponse = validateNMEA(newNMEA)
+
+    if (!validationResponse.success) {
+      reportError(validationResponse.error)
+      return
+    }
+
     console.log("NMEA detected")
     return { type: "nmea", value: newNMEA }
   }
 
   console.warn("unknown format")
+  toast.warn("unknown format", {
+    updateId: "warn",
+    toastId: "warn",
+    autoClose: 1000,
+  })
   return undefined
 }
 
