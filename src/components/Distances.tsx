@@ -57,9 +57,11 @@ const Distances = () => {
         </div>
       </div>
 
-      <p>
+      <p className="mt-4">
         Distances between those coordinates is:{" "}
-        {p1 && p2 ? distance(p1, p2) + " meters" : "unknown"}
+        <span className="font-bold">
+          {p1 && p2 ? distance(p1, p2) + " meters" : "unknown"}
+        </span>
       </p>
     </div>
   )

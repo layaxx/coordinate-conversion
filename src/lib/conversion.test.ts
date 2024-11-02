@@ -39,8 +39,6 @@ test.each(NMEAData)("nmea => degrees => nmea is original", (...input) => {
   const degrees = NMEAToDegrees(input)
   const [[lat, latDir], [long, longDir]] = degreesToNMEA(degrees)
 
-  console.log({ input, degrees, lat, long })
-
   const [[latExpected, latDirExpected], [longExpected, longDirExpected]] = input
 
   expect(latDir).toEqual(latDirExpected)

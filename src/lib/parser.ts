@@ -7,8 +7,16 @@ type ParserResponse =
   | { type: "kml"; value: DecimalDegrees }
 
 export function generalInput(input: string): ParserResponse {
+  input = input.trim()
+  let count = 0
+  while (input.includes("‐") && count < 10) {
+    input = input.replace("‐", "-")
+
+    count++
+  }
+
   let match
-  if ((match = input.match(/^(\d+\.\d+)\s*,\s*(\d+\.\d+)\s*$/))) {
+  if ((match = input.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/))) {
     const newKML: DecimalDegrees = [
       Number.parseFloat(match[1]),
       Number.parseFloat(match[2]),
@@ -55,6 +63,46 @@ export function generalInput(input: string): ParserResponse {
 
     console.log("EXIF detected")
     return { type: "exif", value: newEXIF }
+  }
+
+  if (
+    (match = input.match(
+      /^(N|S)?(\d+)°?\s+(\d+)'?\s+(\d+\.\d+)"?\s+(E|W)?(\d+)°?\s+(\d+)'?\s+(\d+\.\d+)"?\s*$/
+    ))
+  ) {
+    const [_, latDir, latD, latM, latS, longDir, longD, longM, longS] = match
+
+    const newEXIF: EXIF = [
+      [
+        (latDir === "S" ? -1 : 1) * Number.parseInt(latD, 10),
+        Number.parseInt(latM, 10),
+        Number.parseFloat(latS),
+      ],
+      [
+        (longDir === "W" ? -1 : 1) * Number.parseInt(longD, 10),
+        Number.parseInt(longM, 10),
+        Number.parseFloat(longS),
+      ],
+    ] as EXIF
+
+    console.log("EXIF detected")
+    return { type: "exif", value: newEXIF }
+  }
+
+  if (
+    (match = input.match(
+      /^(N|S)(\d+)°?\s+(\d+\.\d+)\s+(E|W)(\d+)°?\s+(\d+\.\d+)\s*$/
+    ))
+  ) {
+    const [_, latDir, latD, latM, longDir, longD, longM] = match
+
+    const newNMEA: NMEA = [
+      [Number.parseInt(latD) * 100 + Number.parseFloat(latM), latDir],
+      [Number.parseInt(longD) * 100 + Number.parseFloat(longM), longDir],
+    ] as NMEA
+
+    console.log("NMEA detected")
+    return { type: "nmea", value: newNMEA }
   }
 
   console.warn("unknown format")

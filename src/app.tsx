@@ -85,7 +85,8 @@ export function App() {
             Either paste a string in the box above or adjust any of the inputs
             below. All other formats (not the field above) will adapt to any
             changes. If you want to input decimal formats, you might need to put
-            a dot between digits, at the end does not work.
+            a dot between digits, at the end does not work. NMEA Koordinaten
+            werden ggf. ohne führende Nullen dargestellt
           </p>
         </div>
         <hr />
