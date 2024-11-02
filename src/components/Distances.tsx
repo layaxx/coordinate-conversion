@@ -1,12 +1,7 @@
 import { useState } from "preact/hooks"
 import Input from "./input"
-import { KeyboardEventHandler } from "preact/compat"
-import { generalInput, parseAsKML } from "../lib/parser"
-import {
-  DecimalDegrees,
-  degreesToDecimalDegrees,
-  NMEAToDecimalDegrees,
-} from "../lib/conversion"
+import { parseAsKML } from "../lib/parser"
+import { DecimalDegrees } from "../lib/conversion"
 import { distance } from "../lib/distance"
 
 const Distances = () => {
@@ -32,6 +27,10 @@ const Distances = () => {
   return (
     <div className="mt-16">
       <h3 className="font-semibold text-xl">Distances</h3>
+      <p className="mb-4">
+        Paste coordinates into the input fields in any of the formats above or
+        click on any of the provided examples
+      </p>
       <div className="flex w-full">
         <div className="w-1/2">
           <label>
