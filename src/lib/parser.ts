@@ -1,4 +1,10 @@
-import { DecimalDegrees, EXIF, NMEA } from "./conversion"
+import {
+  DecimalDegrees,
+  degreesToDecimalDegrees,
+  EXIF,
+  NMEA,
+  NMEAToDecimalDegrees,
+} from "./conversion"
 
 type ParserResponse =
   | undefined
@@ -106,5 +112,22 @@ export function generalInput(input: string): ParserResponse {
   }
 
   console.warn("unknown format")
+  return undefined
+}
+
+export function parseAsKML(input: string): DecimalDegrees | undefined {
+  const parserResponse = generalInput(input)
+
+  if (parserResponse) {
+    switch (parserResponse.type) {
+      case "exif":
+        return degreesToDecimalDegrees(parserResponse.value)
+      case "kml":
+        return parserResponse.value
+      case "nmea":
+        return NMEAToDecimalDegrees(parserResponse.value)
+    }
+  }
+
   return undefined
 }
